@@ -1,4 +1,8 @@
-﻿namespace SodokuValid
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace SodokuValid
 {
     internal class Program
     {
@@ -30,16 +34,91 @@
            };
             Console.WriteLine(isValid(validSoduku));
             Console.WriteLine(isValid(invalidSoduku));
-
         }
 
-        static bool isValid(string[,] input)
+        private static bool isValid(string[,] input)
         {
+            bool isValid = false;
             if (input == null) { return false; }
+            var checkedNumbers = new List<int>();
+
+            // Test ligne par ligne
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    if (input[j, i] != ".")
+                    {
+                        checkedNumbers.Add(Convert.ToInt32(input[j, i]));
+                        if (Convert.ToInt32(input[j, i]) <= 0 || Convert.ToInt32(input[j, i]) > 9)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                isValid = IsDistinct(checkedNumbers);
+                if (!isValid)
+                {
+                    return false;
+                }
+                checkedNumbers.Clear();
+            }
+            // Test colonne par colonne
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (input[j, i] != ".")
+                    {
+                        checkedNumbers.Add(Convert.ToInt32(input[j, i]));
+                        if (Convert.ToInt32(input[j, i]) <= 0 || Convert.ToInt32(input[j, i]) > 9)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                isValid = IsDistinct(checkedNumbers);
+                if (!isValid)
+                {
+                    return false;
+                }
+                checkedNumbers.Clear();
+            }
+
+            // Test par case 3x3
+            for (int o = 0; o < 9; o += 3)
+            {
+                for (int p = 0; p < 9; p += 3)
+                {
+                    for (int i = o; i < o + 3; i++)
+                    {
+                        for (int j = p; j < p + 3; j++)
+                        {
+                            if (input[i, j] != ".")
+                            {
+                                checkedNumbers.Add(Convert.ToInt32(input[i, j]));
+                                if (Convert.ToInt32(input[i, j]) <= 0 || Convert.ToInt32(input[i, j]) > 9)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    isValid = IsDistinct(checkedNumbers);
+                    if (!isValid)
+                    {
+                        return false;
+                    }
+                    checkedNumbers.Clear();
+                }
+            }
             return true;
         }
 
+        private static bool IsDistinct(List<int> list)
+        {
+            if (list.Distinct().Count() != list.Count) { return false; }
+            else { return true; }
+        }
     }
-
 }
-
